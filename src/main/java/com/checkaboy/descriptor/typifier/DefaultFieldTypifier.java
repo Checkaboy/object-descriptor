@@ -1,4 +1,4 @@
-package com.checkaboy.descriptor;
+package com.checkaboy.descriptor.typifier;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -9,20 +9,21 @@ import java.util.concurrent.*;
  *
  * @author Taras Shaptala
  */
-public class FieldTypifier {
+public class DefaultFieldTypifier
+        implements IFieldTypifier {
 
-    private static volatile FieldTypifier instance;
+//    private static volatile DefaultFieldTypifier instance;
 
-    public static FieldTypifier getInstance() {
-        if (instance == null) {
-            synchronized (FieldTypifier.class) {
-                if (instance == null) {
-                    instance = new FieldTypifier();
-                }
-            }
-        }
-        return instance;
-    }
+//    public static DefaultFieldTypifier getInstance() {
+//        if (instance == null) {
+//            synchronized (DefaultFieldTypifier.class) {
+//                if (instance == null) {
+//                    instance = new DefaultFieldTypifier();
+//                }
+//            }
+//        }
+//        return instance;
+//    }
 
     // Default JDK primitives
     private final List<Class<?>> primitives;
@@ -33,8 +34,8 @@ public class FieldTypifier {
     // User-specific data structures
     private final List<Class<?>> specials;
 
-    private FieldTypifier() {
-        primitives = new ArrayList<>(18);
+    private DefaultFieldTypifier() {
+        primitives = new ArrayList<>(19);
         // primitives
         primitives.add(byte.class);
         primitives.add(short.class);
@@ -55,6 +56,7 @@ public class FieldTypifier {
         primitives.add(Boolean.class);
         // append
         primitives.add(String.class);
+        primitives.add(Enum.class);
         primitives.add(Void.class);
 
         collections = new ArrayList<>(24);
@@ -101,22 +103,27 @@ public class FieldTypifier {
         specials = new ArrayList<>(0);
     }
 
+    @Override
     public List<Class<?>> getPrimitives() {
         return primitives;
     }
 
+    @Override
     public List<Class<? extends Collection>> getCollections() {
         return collections;
     }
 
+    @Override
     public List<Class<? extends Map>> getMaps() {
         return maps;
     }
 
+    @Override
     public List<Class<?>> getSpecials() {
         return specials;
     }
 
+    @Override
     public <V> EFieldType fieldType(Class<V> type) {
         if (primitives.contains(type)) return EFieldType.PRIMITIVE;
         else if (collections.contains(type)) return EFieldType.COLLECTION;

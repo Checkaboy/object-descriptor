@@ -1,7 +1,7 @@
 package com.checkaboy.descriptor;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
+import com.checkaboy.descriptor.typifier.EFieldType;
+
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -14,29 +14,23 @@ public class FieldDescriptor<O, V>
     private final EFieldType fieldType;
     private final Class<V> type;
     private final String name;
+    private final boolean writable;
+
     private final Function<O, V> getter;
     private final BiConsumer<O, V> setter;
 
-    public FieldDescriptor(Class<V> type, String name, Function<O, V> getter, BiConsumer<O, V> setter) {
-        this.fieldType = FieldTypifier.getInstance().fieldType(type);
+    public FieldDescriptor(EFieldType fieldType,
+                           Class<V> type,
+                           String name,
+                           boolean writable,
+                           Function<O, V> getter,
+                           BiConsumer<O, V> setter) {
+        this.fieldType = fieldType;
         this.type = type;
         this.name = name;
+        this.writable = writable;
         this.getter = getter;
         this.setter = setter;
-    }
-
-    @SuppressWarnings("unchecked")
-    public FieldDescriptor(Class<O> parent, Class<V> type, String name) throws NoSuchFieldException, IllegalAccessException {
-        this.fieldType = FieldTypifier.getInstance().fieldType(type);
-        this.type = type;
-        this.name = name;
-
-        VarHandle varHandle = MethodHandles
-                .privateLookupIn(parent, MethodHandles.lookup())
-                .findVarHandle(parent, name, type);
-
-        this.getter = (obj) -> (V) varHandle.get(obj);
-        this.setter = (obj, val) -> varHandle.set(obj, (V) val);
     }
 
     @Override
@@ -55,7 +49,14 @@ public class FieldDescriptor<O, V>
     }
 
     @Override
+    public boolean isWritable() {
+        return writable;
+    }
+
+    @Override
     public void set(O object, V value) {
+        if (!writable)
+            throw new UnsupportedOperationException("Field " + name + " is read-only");
         setter.accept(object, value);
     }
 

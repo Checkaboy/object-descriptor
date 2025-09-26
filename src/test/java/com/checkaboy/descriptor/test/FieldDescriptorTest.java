@@ -5,6 +5,7 @@ import com.checkaboy.descriptor.ObjectDescriptor;
 import com.checkaboy.descriptor.model.Car;
 import com.checkaboy.descriptor.model.Engine;
 import com.checkaboy.descriptor.model.Transmission;
+import com.checkaboy.descriptor.typifier.EFieldType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,7 +17,7 @@ public class FieldDescriptorTest {
     @Test
     public void simpleTest() {
         FieldDescriptor<Car, String> descriptor = new FieldDescriptor<>(
-                String.class, "color", Car::getColor, Car::setColor
+                EFieldType.PRIMITIVE, String.class, "color", true, Car::getColor, Car::setColor
         );
         Car car = new Car();
         final String color = "test color";
@@ -25,8 +26,10 @@ public class FieldDescriptorTest {
     }
 
     @Test
-    public void simpleTest2() throws NoSuchFieldException, IllegalAccessException {
-        FieldDescriptor<Car, String> descriptor = new FieldDescriptor<>(Car.class, String.class, "color");
+    public void simpleTest2() {
+        FieldDescriptor<Car, String> descriptor = new FieldDescriptor<>(
+                EFieldType.PRIMITIVE, String.class, "color", true, Car::getColor, Car::setColor
+        );
         Car car = new Car();
         final String color = "test color";
         descriptor.set(car, color);
@@ -34,15 +37,15 @@ public class FieldDescriptorTest {
     }
 
     @Test
-    public void objectTest() throws NoSuchFieldException, IllegalAccessException {
+    public void objectTest() {
         ObjectDescriptor<Car> descriptor = new ObjectDescriptor<>();
 
-        descriptor.put(new FieldDescriptor<>(Car.class, int.class, "doorCount"));
-        descriptor.put(new FieldDescriptor<>(Car.class, String.class, "color"));
-        descriptor.put(new FieldDescriptor<>(Car.class, String.class, "carBrand"));
-        descriptor.put(new FieldDescriptor<>(Car.class, String.class, "model"));
-        descriptor.put(new FieldDescriptor<>(Car.class, Engine.class, "engine"));
-        descriptor.put(new FieldDescriptor<>(Car.class, Transmission.class, "transmission"));
+        descriptor.put(new FieldDescriptor<>(EFieldType.PRIMITIVE, int.class, "doorCount", true, Car::getDoorCount, Car::setDoorCount));
+        descriptor.put(new FieldDescriptor<>(EFieldType.PRIMITIVE, String.class, "color", true, Car::getColor, Car::setColor));
+        descriptor.put(new FieldDescriptor<>(EFieldType.PRIMITIVE, String.class, "carBrand", true, Car::getCarBrand, Car::setCarBrand));
+        descriptor.put(new FieldDescriptor<>(EFieldType.PRIMITIVE, String.class, "model", true, Car::getModel, Car::setModel));
+        descriptor.put(new FieldDescriptor<>(EFieldType.OBJECT, Engine.class, "engine", true, Car::getEngine, Car::setEngine));
+        descriptor.put(new FieldDescriptor<>(EFieldType.OBJECT, Transmission.class, "transmission", true, Car::getTransmission, Car::setTransmission));
 
         Car car = new Car();
         car.setDoorCount(3);

@@ -1,4 +1,4 @@
-package com.checkaboy.descriptor;
+package com.checkaboy.descriptor.typifier;
 
 /**
  * @author Taras Shaptala
